@@ -7,6 +7,9 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import CityListing from "./pages/CityListing";
 import DevelopmentDetails from "./pages/DevelopmentDetails";
+import ReservationDates from "./pages/ReservationDates";
+import ReservationPayment from "./pages/ReservationPayment";
+import ReservationSuccess from "./pages/ReservationSuccess";
 
 function Router() {
   return (
@@ -14,6 +17,9 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/city/:cityId"} component={CityListing} />
       <Route path={"/development/:developmentId"} component={DevelopmentDetails} />
+      <Route path={"/reserve/:developmentId"} component={ReservationDates} />
+      <Route path={"/reservation/:reservationId/payment"} component={ReservationPayment} />
+      <Route path={"/reservation/:reservationId/success"} component={ReservationSuccess} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

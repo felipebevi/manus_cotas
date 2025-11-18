@@ -122,3 +122,11 @@
 
 ## Correções de Bugs
 - [x] Corrigir erro de elementos <a> aninhados no Navbar
+
+## Integração Stripe
+- [x] Adicionar feature Stripe ao projeto
+- [x] Configurar chaves Stripe (pública e secreta)
+- [x] Criar endpoint para criar Payment Intent
+- [x] Implementar página de checkout com Stripe Elements
+- [x] Processar webhooks do Stripe
+- [x] Atualizar status de pagamento após confirmação

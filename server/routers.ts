@@ -193,6 +193,84 @@ export const appRouter = router({
     }),
   }),
 
+  // Payment router
+  payment: router({
+    createCheckoutSession: protectedProcedure
+      .input(z.object({
+        reservationId: z.number(),
+        developmentId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { createCheckoutSession } = await import('./stripe');
+        
+        // Get reservation details
+        const reservation = await db.getReservationById(input.reservationId);
+        if (!reservation) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Reservation not found' });
+        }
+
+        // Verify user owns this reservation
+        if (reservation.customerId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Access denied' });
+        }
+
+        // Get development details
+        const development = await db.getDevelopmentById(input.developmentId);
+        if (!development) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Development not found' });
+        }
+
+        const origin = ctx.req.headers.origin || 'http://localhost:3000';
+
+        const session = await createCheckoutSession({
+          amount: reservation.totalPrice,
+          currency: 'usd',
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || '',
+          userName: ctx.user.name || '',
+          reservationId: reservation.id,
+          developmentName: development.nameKey,
+          successUrl: `${origin}/reservation/${reservation.id}/success`,
+          cancelUrl: `${origin}/reservation/${reservation.id}/payment`,
+        });
+
+        return {
+          sessionId: session.id,
+          url: session.url,
+        };
+      }),
+
+    createPaymentIntent: protectedProcedure
+      .input(z.object({
+        reservationId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { createPaymentIntent } = await import('./stripe');
+        
+        const reservation = await db.getReservationById(input.reservationId);
+        if (!reservation) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Reservation not found' });
+        }
+
+        if (reservation.customerId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Access denied' });
+        }
+
+        const paymentIntent = await createPaymentIntent({
+          amount: reservation.totalPrice,
+          currency: 'usd',
+          userId: ctx.user.id,
+          userEmail: ctx.user.email || '',
+          reservationId: reservation.id,
+        });
+
+        return {
+          clientSecret: paymentIntent.client_secret,
+          paymentIntentId: paymentIntent.id,
+        };
+      }),
+  }),
+
   // Admin router
   admin: router({
     getDashboard: adminProcedure.query(async () => {
