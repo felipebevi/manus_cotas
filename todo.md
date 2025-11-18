@@ -119,3 +119,6 @@
 - [ ] Testes de fluxos de autenticação
 - [ ] Testes de máquinas de estado
 - [ ] Testes de validações
+
+## Correções de Bugs
+- [x] Corrigir erro de elementos <a> aninhados no Navbar

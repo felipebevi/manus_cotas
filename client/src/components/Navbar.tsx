@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl, APP_TITLE, APP_LOGO } from "@/const";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { LanguageSelector } from "./LanguageSelector";
 import { useI18n } from "@/lib/i18n";
 import {
@@ -17,6 +17,7 @@ import { trpc } from "@/lib/trpc";
 export function Navbar() {
   const { user, isAuthenticated, loading } = useAuth();
   const { t } = useI18n();
+  const [, setLocation] = useLocation();
   const logoutMutation = trpc.auth.logout.useMutation();
 
   const handleLogout = async () => {
@@ -51,44 +52,28 @@ export function Navbar() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href="/">
-                          <a className="flex items-center gap-2 w-full">
-                            <Home className="h-4 w-4" />
-                            {t('nav_home', 'Home')}
-                          </a>
-                        </Link>
+                      <DropdownMenuItem onClick={() => setLocation('/')}>
+                        <Home className="h-4 w-4 mr-2" />
+                        {t('nav_home', 'Home')}
                       </DropdownMenuItem>
                       
                       {user.role === 'admin' && (
-                        <DropdownMenuItem asChild>
-                          <Link href="/admin">
-                            <a className="flex items-center gap-2 w-full">
-                              <LayoutDashboard className="h-4 w-4" />
-                              {t('nav_admin', 'Admin Panel')}
-                            </a>
-                          </Link>
+                        <DropdownMenuItem onClick={() => setLocation('/admin')}>
+                          <LayoutDashboard className="h-4 w-4 mr-2" />
+                          {t('nav_admin', 'Admin Panel')}
                         </DropdownMenuItem>
                       )}
                       
                       {user.role === 'cotista' && (
-                        <DropdownMenuItem asChild>
-                          <Link href="/cotista">
-                            <a className="flex items-center gap-2 w-full">
-                              <LayoutDashboard className="h-4 w-4" />
-                              {t('nav_cotista', 'Cotista Portal')}
-                            </a>
-                          </Link>
+                        <DropdownMenuItem onClick={() => setLocation('/cotista')}>
+                          <LayoutDashboard className="h-4 w-4 mr-2" />
+                          {t('nav_cotista', 'Cotista Portal')}
                         </DropdownMenuItem>
                       )}
 
-                      <DropdownMenuItem asChild>
-                        <Link href="/my-reservations">
-                          <a className="flex items-center gap-2 w-full">
-                            <LayoutDashboard className="h-4 w-4" />
-                            {t('nav_my_reservations', 'My Reservations')}
-                          </a>
-                        </Link>
+                      <DropdownMenuItem onClick={() => setLocation('/my-reservations')}>
+                        <LayoutDashboard className="h-4 w-4 mr-2" />
+                        {t('nav_my_reservations', 'My Reservations')}
                       </DropdownMenuItem>
 
                       <DropdownMenuSeparator />
