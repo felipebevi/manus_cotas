@@ -10,6 +10,11 @@ import DevelopmentDetails from "./pages/DevelopmentDetails";
 import ReservationDates from "./pages/ReservationDates";
 import ReservationPayment from "./pages/ReservationPayment";
 import ReservationSuccess from "./pages/ReservationSuccess";
+import DocumentUpload from "./pages/DocumentUpload";
+import CotistaRegister from "./pages/CotistaRegister";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminDocuments from "./pages/AdminDocuments";
+import AdminCotistas from "./pages/AdminCotistas";
 
 function Router() {
   return (
@@ -20,6 +25,11 @@ function Router() {
       <Route path={"/reserve/:developmentSlug"} component={ReservationDates} />
       <Route path={"/reservation/:reservationId/payment"} component={ReservationPayment} />
       <Route path={"/reservation/:reservationId/success"} component={ReservationSuccess} />
+      <Route path={"/reservation/:reservationId/documents"} component={DocumentUpload} />
+      <Route path={"/cotista/register"} component={CotistaRegister} />
+      <Route path={"/admin"} component={AdminDashboard} />
+      <Route path={"/admin/documents"} component={AdminDocuments} />
+      <Route path={"/admin/cotistas"} component={AdminCotistas} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

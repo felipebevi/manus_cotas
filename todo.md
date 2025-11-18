@@ -139,18 +139,18 @@
 
 ## Sistema de Upload de Documentos
 - [x] Endpoint para upload de documentos para S3
-- [ ] Página de upload para clientes (documento com foto + comprovante de residência)
-- [ ] Página de upload para cotistas (documento + comprovante + comprovante de propriedade)
+- [x] Página de upload para clientes (documento com foto + comprovante de residência)
+- [x] Página de upload para cotistas (documento + comprovante + comprovante de propriedade)
 - [x] Validação de tipos de arquivo e tamanho
 - [x] Armazenamento de referências no banco de dados
 
 ## Painel Administrativo
-- [ ] Dashboard com estatísticas gerais
-- [ ] Lista de clientes pendentes de aprovação
-- [ ] Lista de cotistas pendentes de aprovação
-- [ ] Visualização de documentos enviados
-- [ ] Botões para aprovar/rejeitar cadastros
-- [ ] Ativar/desativar clientes e cotistas
-- [ ] Link para gerenciar pagamentos na Stripe
+- [x] Dashboard com estatísticas gerais
+- [x] Lista de clientes pendentes de aprovação
+- [x] Lista de cotistas pendentes de aprovação
+- [x] Visualização de documentos enviados
+- [x] Botões para aprovar/rejeitar cadastros
+- [x] Ativar/desativar clientes e cotistas
+- [x] Link para gerenciar pagamentos na Stripe
 - [ ] Lista de reservas e status
 - [ ] Gestão de empreendimentos
