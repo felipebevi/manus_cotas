@@ -18,20 +18,20 @@ const amenityIcons: Record<string, any> = {
 };
 
 export default function DevelopmentDetails() {
-  const { developmentId } = useParams<{ developmentId: string }>();
+  const { developmentSlug } = useParams<{ developmentSlug: string }>();
   const { t } = useI18n();
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
-  const { data, isLoading } = trpc.developments.getById.useQuery({
-    id: parseInt(developmentId || "0"),
+  const { data, isLoading } = trpc.developments.getBySlug.useQuery({
+    slug: developmentSlug || "",
   });
 
   const handleReserveClick = () => {
     if (!isAuthenticated) {
       window.location.href = getLoginUrl();
     } else {
-      setLocation(`/reserve/${developmentId}`);
+      setLocation(`/reserve/${developmentSlug}`);
     }
   };
 

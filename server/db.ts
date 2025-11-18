@@ -182,6 +182,13 @@ export async function getCityById(cityId: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getCityBySlug(slug: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(cities).where(eq(cities.slug, slug)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
 // ============ Development Helpers ============
 
 export async function getDevelopmentsByCity(cityId: number) {
@@ -198,6 +205,13 @@ export async function getDevelopmentById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
   const result = await db.select().from(developments).where(eq(developments.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getDevelopmentBySlug(slug: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(developments).where(eq(developments.slug, slug)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 

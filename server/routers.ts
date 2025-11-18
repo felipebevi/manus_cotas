@@ -81,6 +81,16 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await db.getCitiesByState(input.stateId);
       }),
+
+    getCityBySlug: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ input }) => {
+        const city = await db.getCityBySlug(input.slug);
+        if (!city) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'City not found' });
+        }
+        return city;
+      }),
   }),
 
   // Developments router
@@ -107,6 +117,28 @@ export const appRouter = router({
           db.getDevelopmentPhotos(input.id),
           db.getDevelopmentAmenities(input.id),
           db.getSponsoredBusinessesByDevelopment(input.id),
+        ]);
+
+        return {
+          development,
+          photos,
+          amenities,
+          businesses,
+        };
+      }),
+
+    getBySlug: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ input }) => {
+        const development = await db.getDevelopmentBySlug(input.slug);
+        if (!development) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Development not found' });
+        }
+
+        const [photos, amenities, businesses] = await Promise.all([
+          db.getDevelopmentPhotos(development.id),
+          db.getDevelopmentAmenities(development.id),
+          db.getSponsoredBusinessesByDevelopment(development.id),
         ]);
 
         return {
@@ -268,6 +300,124 @@ export const appRouter = router({
           clientSecret: paymentIntent.client_secret,
           paymentIntentId: paymentIntent.id,
         };
+      }),
+  }),
+
+  // Documents router
+  documents: router({
+    uploadCustomerDocument: protectedProcedure
+      .input(z.object({
+        reservationId: z.number(),
+        documentType: z.enum(['id', 'address_proof', 'other']),
+        fileData: z.string(), // base64 encoded
+        fileName: z.string(),
+        contentType: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { uploadFile, validateFile, DOCUMENT_TYPES, MAX_DOCUMENT_SIZE_MB } = await import('./upload');
+        const { getDb } = await import('./db');
+        const { documents } = await import('../drizzle/schema');
+        
+        // Verify reservation exists and belongs to user
+        const reservation = await db.getReservationById(input.reservationId);
+        if (!reservation) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Reservation not found' });
+        }
+        if (reservation.customerId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Access denied' });
+        }
+
+        // Decode base64 file
+        const fileBuffer = Buffer.from(input.fileData, 'base64');
+        
+        // Validate file
+        const validation = validateFile(
+          input.contentType,
+          fileBuffer.length,
+          DOCUMENT_TYPES,
+          MAX_DOCUMENT_SIZE_MB
+        );
+        
+        if (!validation.valid) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: validation.error });
+        }
+
+        // Upload to S3
+        const uploadResult = await uploadFile(
+          fileBuffer,
+          ctx.user.id,
+          'customer-documents',
+          input.fileName,
+          input.contentType
+        );
+
+        // Save to database
+        const dbInstance = await getDb();
+        if (!dbInstance) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+        }
+
+        await dbInstance.insert(documents).values({
+          reservationId: input.reservationId,
+          customerId: ctx.user.id,
+          documentType: input.documentType,
+          fileUrl: uploadResult.fileUrl,
+          fileKey: uploadResult.fileKey,
+          status: 'under_review',
+        });
+
+        return {
+          success: true,
+          fileUrl: uploadResult.fileUrl,
+        };
+      }),
+
+    uploadCotistaDocument: protectedProcedure
+      .input(z.object({
+        documentType: z.enum(['identity', 'address_proof', 'ownership_proof']),
+        fileData: z.string(), // base64 encoded
+        fileName: z.string(),
+        contentType: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { uploadFile, validateFile, DOCUMENT_TYPES, MAX_DOCUMENT_SIZE_MB } = await import('./upload');
+        
+        // Decode base64 file
+        const fileBuffer = Buffer.from(input.fileData, 'base64');
+        
+        // Validate file
+        const validation = validateFile(
+          input.contentType,
+          fileBuffer.length,
+          DOCUMENT_TYPES,
+          MAX_DOCUMENT_SIZE_MB
+        );
+        
+        if (!validation.valid) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: validation.error });
+        }
+
+        // Upload to S3
+        const uploadResult = await uploadFile(
+          fileBuffer,
+          ctx.user.id,
+          'cotista-documents',
+          input.fileName,
+          input.contentType
+        );
+
+        return {
+          success: true,
+          fileUrl: uploadResult.fileUrl,
+          fileKey: uploadResult.fileKey,
+          documentType: input.documentType,
+        };
+      }),
+
+    getMyDocuments: protectedProcedure
+      .input(z.object({ reservationId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getDocumentsByReservation(input.reservationId);
       }),
   }),
 

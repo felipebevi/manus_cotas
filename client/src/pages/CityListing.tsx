@@ -17,19 +17,20 @@ import {
 import { Slider } from "@/components/ui/slider";
 
 export default function CityListing() {
-  const { cityId } = useParams<{ cityId: string }>();
+  const { citySlug } = useParams<{ citySlug: string }>();
   const { t } = useI18n();
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [sortBy, setSortBy] = useState("price_asc");
 
-  const { data: developments, isLoading } = trpc.developments.getByCity.useQuery({
-    cityId: parseInt(cityId || "0"),
+  const { data: city } = trpc.geography.getCityBySlug.useQuery({
+    slug: citySlug || "",
   });
 
-  const { data: city } = trpc.geography.getCities.useQuery(
-    { stateId: 0 }, // We'll need to improve this
-    { enabled: false }
-  );
+  const { data: developments, isLoading } = trpc.developments.getByCity.useQuery({
+    cityId: city?.id || 0,
+  }, {
+    enabled: !!city,
+  });
 
   if (isLoading) {
     return (
@@ -148,7 +149,7 @@ export default function CityListing() {
                         <p className="text-xl font-bold">${(dev.startingPrice / 100).toFixed(2)}</p>
                       </div>
                       <Button asChild>
-                        <Link href={`/development/${dev.id}`}>
+                        <Link href={`/development/${dev.slug}`}>
                           <a>{t('view_details', 'View Details')}</a>
                         </Link>
                       </Button>

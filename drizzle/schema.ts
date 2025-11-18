@@ -74,6 +74,7 @@ export const cities = mysqlTable("cities", {
   id: int("id").autoincrement().primaryKey(),
   stateId: int("stateId").notNull(),
   nameKey: varchar("nameKey", { length: 255 }).notNull(), // i18n key
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
   latitude: decimal("latitude", { precision: 10, scale: 7 }).notNull(),
   longitude: decimal("longitude", { precision: 10, scale: 7 }).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -92,6 +93,7 @@ export const developments = mysqlTable("developments", {
   id: int("id").autoincrement().primaryKey(),
   cityId: int("cityId").notNull(),
   nameKey: varchar("nameKey", { length: 255 }).notNull(), // i18n key
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
   descriptionKey: varchar("descriptionKey", { length: 255 }).notNull(), // i18n key
   shortDescriptionKey: varchar("shortDescriptionKey", { length: 255 }).notNull(), // i18n key
   address: text("address"),

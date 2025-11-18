@@ -11,15 +11,15 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 export default function ReservationDates() {
-  const { developmentId } = useParams<{ developmentId: string }>();
+  const { developmentSlug } = useParams<{ developmentSlug: string }>();
   const [, setLocation] = useLocation();
   const { t } = useI18n();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
-  const { data: developmentData, isLoading } = trpc.developments.getById.useQuery({
-    id: parseInt(developmentId || "0"),
+  const { data: developmentData, isLoading } = trpc.developments.getBySlug.useQuery({
+    slug: developmentSlug || "",
   });
 
   const handleCreateReservation = async () => {

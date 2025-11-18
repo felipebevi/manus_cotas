@@ -15,9 +15,9 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/city/:cityId"} component={CityListing} />
-      <Route path={"/development/:developmentId"} component={DevelopmentDetails} />
-      <Route path={"/reserve/:developmentId"} component={ReservationDates} />
+      <Route path={"/city/:citySlug"} component={CityListing} />
+      <Route path={"/development/:developmentSlug"} component={DevelopmentDetails} />
+      <Route path={"/reserve/:developmentSlug"} component={ReservationDates} />
       <Route path={"/reservation/:reservationId/payment"} component={ReservationPayment} />
       <Route path={"/reservation/:reservationId/success"} component={ReservationSuccess} />
       <Route path={"/404"} component={NotFound} />
