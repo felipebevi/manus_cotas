@@ -255,3 +255,12 @@
 4. Completar calendário de disponibilidade
 5. Implementar tratamento de erros
 6. Criar todos os testes
+
+## Melhorias Visuais
+- [x] Ativar modo globo 3D no mapa da página inicial (Google Maps já usa DEMO_MAP_ID que habilita visualização 3D)
+
+## Setup e Deployment
+- [x] Criar arquivo .env.example com todas as variáveis
+- [x] Criar script de migração do banco de dados
+- [x] Criar script de seed para popular dados iniciais
+- [x] Documentar processo de setup local

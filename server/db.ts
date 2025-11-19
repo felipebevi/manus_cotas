@@ -445,3 +445,55 @@ export async function createAuditNote(note: {
   
   await db.insert(auditNotes).values(note);
 }
+
+// ============ Cotista Additional Helpers ============
+
+export async function getCotistaAvailability(cotistaId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(cotistaAvailability)
+    .where(eq(cotistaAvailability.cotistaId, cotistaId))
+    .orderBy(asc(cotistaAvailability.startDate));
+}
+
+export async function addCotistaAvailability(data: {
+  cotistaId: number;
+  startDate: Date;
+  endDate: Date;
+  pricePerNight: number;
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  // Convert price to cents
+  const priceInCents = Math.round(data.pricePerNight * 100);
+  
+  await db.insert(cotistaAvailability).values({
+    cotistaId: data.cotistaId,
+    startDate: data.startDate,
+    endDate: data.endDate,
+    pricePerNight: priceInCents,
+    isPublished: true,
+    isBooked: false,
+  });
+  
+  return { success: true };
+}
+
+export async function getCotistaReservations(cotistaId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select({
+    reservation: reservations,
+    customer: users,
+    availability: cotistaAvailability
+  })
+    .from(reservations)
+    .innerJoin(users, eq(reservations.customerId, users.id))
+    .innerJoin(cotistaAvailability, eq(reservations.availabilityId, cotistaAvailability.id))
+    .where(eq(cotistaAvailability.cotistaId, cotistaId))
+    .orderBy(desc(reservations.createdAt));
+}
